@@ -1,0 +1,39 @@
+reffer to: https://linux.cn/article-6241-1.html
+
+CentOS / RHEL 7中讨论网络管理命令行工具NetworkManager command line tool，也叫nmcli。
+那些使用ifconfig的用户应该在CentOS 7中避免使用ifconfig了。
+
+
+nmcli能发送dhcp，若要禁用dhcp:
+nmcli n           #查看托管状态
+nmcli n {on|off}    #开启或关闭 托管
+nmcli con up ens3  #检查networkmanager的功能
+
+
+#查看设备或连接
+nmcli connecion show
+nmcli connection enp0s3
+nmcli device status
+
+#创建dhcp连接
+nmcli connection add con-name "dhcp" type ethernet ifname eno16777736
+
+#创建静态ip
+nmcli connection add con-name "static" ifname eno16777736 autoconnect no type ethernet ip4 192.168.1.240 gw4 192.168.1.1
+
+#修改连接
+nmcli connection modify "static" +ipv4.addresses 192.168.200.1/24  #添加更多的静态ip
+nmcli connection modify "static" ipv4.dns 202.131.124.4
+nmcli connection modify "static" +ipv4.dns 8.8.8.8   #添加更多的dns
+
+#更新或激活连接
+nmcli connection up eno1
+
+ip addr show
+ip route
+tracepath www.baidu.com
+
+
+
+
+

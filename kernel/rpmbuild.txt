@@ -1,0 +1,6 @@
+reffer to: https://blog.csdn.net/mrbuffoon/article/details/82766664
+rpm 打包及其命令
+
+rpm2cpio *.rpm | cpio -div    #查看rpm包
+yum install rpm-build
+yum install rpmdevtools

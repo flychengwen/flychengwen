@@ -1,0 +1,103 @@
+【1】编译内核
+https://blog.csdn.net/youshijifen/article/details/73472434
+https://blog.51cto.com/191226139/2059117
+
+nmcli connection up enp0s3
+yum install -y wget net-tools  gcc gcc-c++
+yum install -y flex bison
+yum install -y openssl   openssl-devel ncurses-devel
+yum install -y elfutils-libelf-devel perl
+
+https://mirrors.edge.kernel.org/pub/linux/kernel/v4.x/linux-4.14.141.tar.gz
+xz -d linux-4.14.141.tar.xz 
+tar -xvf linux-4.14.141.tar
+cd linux-4.14.141
+make -j 10
+make -j 10 modules
+make modules_install
+make install
+
+[root@localhost linux-4.14.141]# find . -name \*.o | wc -l
+12620
+[root@localhost linux-4.14.141]# find . -name \*.c | wc -l
+26460
+
+【2】设置启动菜单
+grub2-editenv list
+cat /boot/grub/grub.cfg 
+grub2-set-default "CentOS Linux (4.14.141) 7 (Core)"
+grub2-editenv list
+
+[root@localhost ~]# grub2-editenv list
+saved_entry=CentOS Linux (4.14.141) 7 (Core)
+
+
+【3】编译内核模块
+cp  megaraid_sas-07.719.03.00 /root/linux-4.14.141/drivers/scsi/ -fr  
+#make -C  /lib/modules/`uname -r`/build SUBDIRS=/root/linux-4.14.141/drivers/scsi/megaraid_sas-07.719.03.00 clean
+make -C  /lib/modules/`uname -r`/build SUBDIRS=/root/linux-4.14.141/drivers/scsi/megaraid_sas-07.719.03.00
+
+
+【4】verify
+modprobe -r megaraid_sas
+modprobe megaraid_sas
+rmmod megaraid_sas.ko 
+insmod  /root/linux-4.14.141/drivers/scsi/megaraid_sas-07.719.03.00/megaraid_sas.ko 
+lsmod | grep mega
+modinfo megaraid_sas | grep version
+dmesg -c | tail -n 10
+dmesg
+
+【5】loading out-of-tree module taints kernel
+问题描述：
+[root@localhost megaraid]# dmesg
+[  602.984136] megaraid_sas: loading out-of-tree module taints kernel.
+[  602.985033] megasas: 07.719.03.00
+
+原因分析：
+cat /boot/config-5.4.0-92-generic  | grep CONFIG_MODULE_SIG
+CONFIG_MODULE_SIG=y
+# CONFIG_MODULE_SIG_FORCE is not set
+CONFIG_MODULE_SIG_ALL=y
+
+CONFIG_MODULE_SIG=y   #表示开启了签名机制
+CONFIG_MODULE_SIG_FORCE=y    #模块必须有正确的签名才能正常使用。
+CONFIG_MODULE_SIG_ALL=y   #内核在编译的时候，会主动去给模块签名。
+
+
+解决方法： 自己在驱动源码种添加一句MODULE_INFO(intree, "Y");，以欺骗内核本模块为树内模块（最好不要这么搞）
+[root@localhost megaraid_sas-07.719.03.00]# vi megaraid_sas_base.c
+//add by zhaocwa
+MODULE_INFO(intree, "Y");
+
+reffer to:
+http://www.javashuo.com/article/p-zuirszln-kt.html
+https://www.cnblogs.com/sky-heaven/p/13280047.html
+
+
+【附录1】使用RPM包升级内核
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+yum --enablerepo=elrepo-kernel install kernel-ml-devel kernel-ml -y
+grub2-set-default 0   #更改内核启动顺序
+uname -r
+
+【附录2】清除多余的内核
+rm -f /lib/modules/4.14.12hunk-2018-1.0
+
+rm -f /usr/src/4.14.12hunk-2018-1.0  #删除内核源码
+
+rm -rf /boot/initramfs-4.14.12hunk-2018-1.0.img 
+rm -rf  /boot/initramfs-4.14.12hunk-2018-1.0.img.gz 
+rm -rf  /boot/vmlinuz-5.4.0-92-generic
+rm -rf  /boot/System.map-4.14.12hunk-2018-1.0
+
+#重新生成grub.cfg
+grub2-mkconfig -o /boot/grub2/grub.cfg   #centos
+update-grub2                                             #ubuntu
+
+
+
+
+
+
