@@ -1,0 +1,70 @@
+reffer to: https://blog.csdn.net/mrbuffoon/article/details/82766664
+rpm 打包及其命令
+
+rpm2cpio *.rpm | cpio -div    #查看rpm包
+yum install -y rpm-build rpmdevtools
+yum install rpm-sign -y
+
+#spec配置模板
+ls /etc/rpmdevtools/
+
+#默认配置文件
+cat /usr/lib/rpm/macros | grep _topdir
+rpmbuild --showrc | grep _topdir
+
+#自定义配置文件
+vi ~/.rpmmacros
+%_topdir   /home/flychengwen/rpmbuild   #修改工作车间，默认的工作车间是 ${HOME}/rpmbuild, 参见/usr/lib/rpm/macros
+%_gpg_name flychengwe                   #若需要对rpm签名，则添加之
+...
+
+#创建rpmbuild目录
+#手工创建
+mkdir -p ~/rpmbuild/{BUILD, RPMS, SOURCES, SPECS, SRPMS}
+#自动创建
+rpmdev-setuptree
+[root@localhost ~]# tree rpmbuild
+rpmbuild
+├── BUILD
+├── RPMS
+├── SOURCES
+├── SPECS
+└── SRPMS
+
+#创建spec模板
+rpmdev-newspec  xxx.spec
+
+#rpmdev还能自动生成/etc/init.d/下的服务脚本{start|stop|restart}
+rpmdev-newinit  appN
+
+
+//////////////////////////////////////////////////////////
+                       心得体会
+/////////////////////////////////////////////////////////
+%setup相当于执行：
+cd ~/rpmbuild/BUILD/
+mkdir -p ~/rpmbuild/BUILD/%{Name}-%{Version}-%{Release}.x86_64
+cp ~/rpmbuild/%{Name}-%{Version}.tar.gz ~/rpmbuild/BUILD
+tar -zxf ~/rpmbuild/%{Name}-%{Version}.tar.gz -C ~/rpmbuild/BUILD/%{Name}-%{Version}-%{Release}.x86_64
+
+%setup -q: quiet
+%setup -c: 解压缩之前先产生目录
+%setup -n: 将软件包解压在newdir目录
+
+
+%install相当于执行：
+cd ${RPM_BUILD_DIR}
+make install
+如果有创建目录，拷贝动作，也可以在此添加shell语句
+
+
+%files
+${RPM_BUILD_ROOT}需要打包的目录或文件(bin,lib)，使用绝对路径
+%doc
+${RPM_BUILD_ROOT}需要打包的目录或文件(man,doc)，使用绝对路径
+%exclude
+${RPM_BUILD_ROOT}不允许打包的目录或文件，使用绝对路径
+
+如果要制作脚本 或者 二进制包，%setup, %build都要屏蔽掉，只使用%install，%files即可
+Linux内核支持生成rpm升级包，命令是make rpm -j 8：kernel会先脚本生成kernel.spec, 再用kernel.spec编译出3个rpm包
+许多开源软件自带spec，比如rp-pppoe-2.15.tar.gz, 只要将spec和源代码压缩包分别放入rpmbuild/SOURCES或rpmbuild/SPEC子目录下, 执行rpmbuild -bb rpmbuild/xxx.spec即可
