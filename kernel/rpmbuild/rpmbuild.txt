@@ -12,6 +12,11 @@ ls /etc/rpmdevtools/
 cat /usr/lib/rpm/macros | grep _topdir
 rpmbuild --showrc | grep _topdir
 
+#查看宏，或直接查看/usr/lib/rpm/macros
+rpm --eval "%{_bindir}"
+rpm --eval "%{_datadir}"
+rpm --eval "%{_includedir}"
+
 #自定义配置文件
 vi ~/.rpmmacros
 %_topdir   /home/flychengwen/rpmbuild   #修改工作车间，默认的工作车间是 ${HOME}/rpmbuild, 参见/usr/lib/rpm/macros
@@ -39,7 +44,7 @@ rpmdev-newinit  appN
 
 
 //////////////////////////////////////////////////////////
-                       心得体会
+                       心得体会1
 /////////////////////////////////////////////////////////
 %setup相当于执行：
 cd ~/rpmbuild/BUILD/
@@ -68,3 +73,12 @@ ${RPM_BUILD_ROOT}不允许打包的目录或文件，使用绝对路径
 如果要制作脚本 或者 二进制包，%setup, %build都要屏蔽掉，只使用%install，%files即可
 Linux内核支持生成rpm升级包，命令是make rpm -j 8：kernel会先脚本生成kernel.spec, 再用kernel.spec编译出3个rpm包
 许多开源软件自带spec，比如rp-pppoe-2.15.tar.gz, 只要将spec和源代码压缩包分别放入rpmbuild/SOURCES或rpmbuild/SPEC子目录下, 执行rpmbuild -bb rpmbuild/xxx.spec即可
+
+//////////////////////////////////////////////////////////
+                       心得体会2
+/////////////////////////////////////////////////////////
+rpmbuild会根据spec生成打包的脚本,形如：rpm-tmp.uf2L4g
+如果rpmbuild打包成功，会删除该脚本
+如果rpmbuild打包失败，既可以根据报错信息定位问题，也可以直接查看脚本
+
+
