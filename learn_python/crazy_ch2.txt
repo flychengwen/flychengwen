@@ -1,0 +1,132 @@
+弱类型：
+不用声明
+数据类型可以随时改变，同时一个变量可以一会儿是数值型，一会儿是字符串型
+--------------------------------------------------------
+print "hello world"   //python2
+print("hello world")  //python3
+
+help(print)
+print(value, ..., sep=' ', end='\n', file=sys.stdout, flush=False)
+eg1: print('a','b','c',sep='|',end='\n\n')
+eg2: 
+root@2004a:~# cat test.py 
+f=open("poem.txt", "w");
+print("12345", file=f);
+print("45678", file=f);
+f.close();
+
+python3允许为数值增加下划线，来提高可读性
+>>> a=1_000_000
+>>> print(a)
+1000000
+
+科学计数法
+>>> 5e3
+5000.0
+--------------------------------------------------------
+拼接字符串
+(1)自动拼接
+>>> s="hello," 'world'
+>>> print(s)
+hello,world
+
+(2)使用+拼接
+>>> s1="python"
+>>> s2="is funny"
+>>> s3=s1+s2
+>>> print(s3)
+pythonis funny
+--------------------------------------------------------
+repr和str
+repr是内置函数，str是内置类型
+#将数值转换为字符串，与其他字符串拼接
+>>> s="the price of the book is:"
+>>> p=35.00
+>>> print(s,str(p))
+>>> print(s,repr(p))
+>>> 
+>>> print(s+repr(p))
+>>> print(s+str(p)) 
+>>> 
+--------------------------------------------------------
+python3的input  和  python2.7的raw_input：
+>>> choice=input('please input your choice:')  
+>>> print(choice)
+--------------------------------------------------------
+原始字符串，不会把反斜杠当转义字符
+s1=r'g:\test\1.txt'
+print(s1)
+--------------------------------------------
+字节数组
+root@2004a:/home/test# cat test.py 
+b1=bytes()
+b2=b''
+b3=b'hello'
+b4=bytes('I love python', encoding='utf-8')  //字符串转换为字节数组
+b5='I love python'.encode('utf-8')  //字符串转换为字节数组
+print(b4)
+print(b5)
+s = b4.decode('utf-8') //字节数组转换为字符串
+print(s)
+
+输出:
+root@2004a:/home/test# python3 test.py 
+b'I love python'
+b'I love python'
+I love python
+--------------------------------------------
+dir(str)                #查看字符串类的细节
+help(str.encode)  #查看字符串的encode方法
+
+str的常用方法：
+decode  //byttes数组转换为字符串
+title
+lower
+upper
+strip
+lstrip
+rstrip
+startswith
+endswith
+split
+join
+
+s="lilei's domain is crayit.org"
+print(s.split('.'))
+print(s.split())
+li=s.split()
+print(li)
+print('/'.join(li))
+--------------------------------------------
+/是普通除法
+//是整数除法
+三目运算符： true_statements if expression else false_statements
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
