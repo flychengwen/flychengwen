@@ -1,3 +1,165 @@
 列表，元组和字典
 列表和元组：都是索引访问，但元组不能修改，列表可以修改
 
+
+---------------------------
+tuple:
+
+序列封包
+//tuple封包
+arr = 10, 20, 30
+arr=tuple(range(1,10,2))
+
+//list封包，有个星
+fir, sec, *arr, fo=1,2,3,4,5,6 
+*arr=1,2,3  //错误
+
+序列解包:
+a,b,c,d,e=arr
+------------------------------------
+元组转列表
+
+tt = (1,2,3)
+li = list(tt)
+print(type(li))
+-------------------------------------
+append方法:
+
+#元组不能动态添加，所以没有append方法
+aa=list(range(1,5))
+aa.append('fik')
+aa.append((11,22))
+aa.append([33,44])
+#bb = aa.append((11,22)).append([33,44]) //error
+print(aa)
+print(type(aa))
+-------------------------------------
+expand方法：
+
+aa=list(range(1,5))
+aa.extend('fik')
+aa.extend((11,22))
+aa.extend([33,44])
+print(aa)
+print(type(aa))
+-------------------------------------------------------
+insert，append，del，修改 #insert指定插入，append是追加
+
+aa=list(range(1,5))
+aa.insert(2,'sec')
+#aa.insert(2, tuple('a', 'b'))  //错误
+aa.insert(2, tuple('a'))
+print(aa)
+
+aa[0]=100
+print(aa)
+
+del aa[0:2]
+print(aa)
+----------------------------------------------
+dir(list)   //查看帮助信息
+help(list)  //查看帮助信息
+
+a=[2,30,'a', [5,30],30]
+print(a.count(30))
+print(a.index(30))
+print(a.pop())
+
+b=[11, 23, 5, 88, 103]
+print("testcase:", b)
+b.reverse()
+print("call reverse:", b)
+b.sort()
+print("call sort:", b)
+
+
+//sort方法，注意tuple的元素不能动态修改，所以没有sort和reverse方法
+s_arr=["eeee", "aa", "hello",  "bbb", "welcome", "ccc"]
+print(s_arr)
+s_arr.sort(key=len)
+print(s_arr)
+s_arr.sort(key=len, reverse=True)
+print(s_arr)
+
+
+//下列代码只能在python2中使用
+def my_cmp(x,y):
+    return 1 if len(x) > len(y) else (-1 if len(x) < len(y) else 0)
+s_arr=["eeee", "aa", "hello",  "bbb", "welcome", "ccc"]
+s_arr.sort(my_cmp)
+----------------------------------------------
+字典：
+
+v1=[('age', 33), ('height', 164)]
+print(dict(v1))
+v2=[['age', 33], ['height', 164]]
+print(dict(v2))
+v3 = dict(age=33, name='zcw')
+print(dict(v3))
+
+添加，修改，del
+print('test case')
+scores={'cn':65}
+print(scores)
+
+print('modify elements:')
+scores['cn']=98
+print(scores)
+
+print("add elements:")
+scores['en'] = 74
+scores['math'] = 100
+print(scores)
+
+print("del elements")
+del(scores['math'])
+print(scores)
+-------------------------------------------------
+字典的update, setdefault, keys, values, items方法
+stu={'zcw':11, 'zhangsan':22}
+print(stu.get('zcw'))
+print(stu.get('wangwu'))
+
+stu.update({'lisi':55, 'zhangsan':24})
+print(stu)
+
+print('----items, keys, values-----')
+print(stu.items())
+print(stu.values())
+print(stu.keys())
+print(list(stu.keys()))
+
+
+print(stu.pop('zhangsan'))
+print(stu)
+
+print(stu.popitem())
+k,v=stu.popitem()
+print(k,v)
+
+print('-----test setdefault-------')
+stu.update({'pp': 2.4})
+stu.setdefault('pp', 2.3)  //'pp'已经存在，不会覆盖
+print(stu)
+
+stu.setdefault('kate', 2.5) //'pp'不存在，会覆盖
+print(stu)
+
+print('-----test fromkeys-------')
+stu = dict.fromkeys((13, 17))
+print(stu)
+stu = dict.fromkeys(['a', 'b'])
+print(stu)
+stu = dict.fromkeys(('zcw', 'zhangsan'), 88)
+print(stu)
+
+stu.clear()
+print(stu)
+
+--------------------------------------------------------------------
+格式化输出
+
+stu={'name':'zcw', 'age':33, 'score':88.5}
+format='name is:%(name)s, age is:%(age)i  scores is: %(score)010.2f'
+print(format % stu)
+
