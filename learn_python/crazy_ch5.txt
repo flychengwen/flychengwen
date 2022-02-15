@@ -1,0 +1,201 @@
+----------------------------
+帮助文档：
+
+def my_max(x,y):
+    '''get max of two number'''
+    z=x if x > y else y
+    return z
+help(my_max)
+print("--------------\n")
+print(my_max.__doc__)
+----------------------------
+关键字参数：
+
+def func(wi, hi):
+    print("wi=", wi)
+    print("hi=", hi)
+    return 2*(wi+hi)
+print(func(hi=12, wi=2))
+print(func(3.5, hi=4))
+----------------------------
+函数默认值：
+
+def fun(char, hi=5):
+    for i in range(1, hi+1):
+        for j in range(hi-i):
+            print(' ', end=' ')
+        for j in range(2*i-1):
+            print(char, end=' ')
+        print()
+fun('*', 6)
+-------------------------------------------------------------
+函数可变参数收集：
+
+python允许在形参前面加一个星号，这意味着该参数可接收多个参数值，
+多个参数值被当成tuple传入
+def func(a, *books):
+    print(books)
+    for i in books:
+        print(i)
+    print(a)
+func(11, 'c++', 'java', 'lua')
+
+
+形参前面加两个星号：可接收多个关键字参数，
+多个关键字参数值被当成 【字典】
+def func(a, *books, **scores):
+    print(books)
+    print(scores)
+    print(a)
+func(11, 'c++', 'lua', 'java', cn=98, en=69, math='55')
+func(11, cn=98, en=69, math='55')
+-------------------------------------------------------------
+逆向参数收集：
+
+一个星是list或tuple
+两个星是字典
+
+def foo(name, *nums):
+    print("name:", name)
+    print("nums:", nums)
+foo('zhangsan', [1,2,3])
+print('\n')
+
+def func(name, *nums, **stu):
+    print("name:", name)
+    print("nums:", nums)
+    print("stu:", stu)
+func('zcw', {'cn':88, 'en':93})
+------------------------------------------------------------
+值传递：
+
+def swap(a,b):
+    a,b=b,a
+    print(a,b)
+a=11
+b=34
+print("before swap:")
+print(a,b)
+print("\nin swap:")
+swap(a,b)
+print("\nafter swap:")
+print(a,b)
+------------------------------------------------------------
+python提供了如下三个工具函数来获取指定范围内的字典变量：
+globals()返回字典值
+locals()返回字典值
+vars()和locals的作用完全相同
+
+
+x=11
+y=24
+print(globals())
+print(globals()['x'])
+globals()['x'] = 55
+print(globals())
+------------------------------------------------------------
+局部函数 或 函数嵌套定义：
+
+def get_math_func(type, n):
+    def square(n):
+        return n*n
+    def cube(n):
+        return n*n*n
+    if type=="square":
+        return square(n)
+    else:
+        return cube(n)
+print(get_math_func("cube", 3))
+------------------------------------------------------------
+函数当成对象 或 函数指针：
+
+def square(n):
+    return n*n
+def cube(n):
+    return n*n*n
+
+my_fun=square
+print(my_fun(4))
+
+my_fun=cube
+print(my_fun(4))
+------------------------------------------------------------
+将函数作为参数或返回值
+eg1:
+def square(n):
+    return n*n
+def cube(n):
+    return n*n*n
+
+def map(n, fn):
+    return fn(n)
+print(map(4, square))
+print(map(4, cube))
+
+
+
+eg2:
+def square(n):
+    return n*n
+def cube(n):
+    return n*n*n
+
+def get_math_func(type):
+    if type=="cube":
+        return cube
+    else:
+        return square
+
+print(get_math_func("cube")(4))
+print(get_math_func("square")(6))
+------------------------------------------------------------
+lambda表达式:
+map(function, iterable)是python的内置函数，
+对参数序列中的每一个值，都调用function
+其返回值是map对象
+
+eg1:lambda x,y:x*x+y*y
+
+eg2:
+def get_math_func(type):
+    if type=="cube":
+        return lambda n:n*n
+    else:
+        return lambda n:n*n*n
+
+print(get_math_func("cube")(4))
+print(get_math_func("square")(6))
+
+eg3:
+li=map(lambda x:x*x, range(1,6))
+print([i for i in li])
+
+eg4:
+li=map(lambda x:x*x if x%2==0 else 0, range(1,10))
+print([i for i in li])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

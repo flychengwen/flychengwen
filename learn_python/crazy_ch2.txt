@@ -102,31 +102,3 @@ print('/'.join(li))
 //是整数除法
 三目运算符： true_statements if expression else false_statements
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
