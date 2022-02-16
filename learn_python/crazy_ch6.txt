@@ -1,0 +1,551 @@
+类与未绑定的方法
+类方法和静态方法
+@符号和函数装饰器
+类变量和实例变量的差别
+使用property定义属性
+使用特殊成员实现封装
+python的继承
+多继承的语法
+重写父类的方法
+使用未绑定方法调用被重写方法
+使用super()
+python多态
+类型检查的相关函数和属性
+枚举类的用法
+枚举类及构造器
+
+
+实例的第一个参数并不一定叫self，其实完全可以叫任意参数名，只是约定俗称的把该参数命名未self，具有最好的可读性
+python有一个特别的方法:__init__，称为构造方法，第一个参数是self
+--------------------------------------------------------------
+可以在类命名空间中直接放代码
+
+//空类
+class Empty:
+	pass
+--------------------------------------------------------------
+动态增删实例变量：
+
+class Empty:
+    pass
+p = Empty()
+p.skills = ['java', 'swift']
+print(p.skills)
+
+del p.skills
+
+-------------------------------------------------------------------
+class dog:
+    def jump(self):
+        print("executing jump")
+    def run(self):
+        self.jump()
+        print("executing running")
+
+dd=dog()
+dd.run()
+-------------------------------------------------------------------
+class User:
+    def test(self):
+        print('self param:', self)
+u=User()
+u.test()
+
+foo=u.test
+foo()
+-------------------------------------------------------------------
+class User:
+    def test(self):
+        print('self param:', self)
+        return self    ###########莫忘了#############
+u=User()
+u.test().test().test()
+
+foo=u.test
+foo()
+-------------------------------------------------------------------
+静态方法和实例方法:
+
+class User:
+    bar=200
+    def test():
+        print("hello")
+    def run(self):
+        print("running")
+User.test()
+
+u = User()
+u.run()
+-------------------------------------------------------------------
+@classmethod: 修饰的方法是类方法，该类方法定义了一个cls参数，该参数会自动绑定到Bird类本身。
+			   不管程序是使用类，还是对象调用该方法，python始终会将该类方法的第一个参数绑定到类本身。
+@staticmethod:
+
+class Bird:
+    @classmethod
+    def fly(cls):
+        print('class method fly:', cls)
+    @staticmethod
+    def info(y):
+        print('static method info:', y)
+Bird.fly()
+Bird.info('crazy')
+
+b=Bird()
+b.fly()
+b.info('apple')
+---------------------------------------------------------------------------------------------------
+@函数装饰器
+@classmethod和@staticmethod的本质就是函数装饰器，其中staticmethod和classmethod都是python内置的函数。
+通过函数装饰器，可以为被修饰的函数添加权限检查
+
+
+def funA(fn):
+    print("A")
+    fn()
+    return 'fkit'
+
+####会用funA来装饰funB###########
+####funB的执行效果相当于funA(funB)
+@funA
+def funB():
+    print("B")
+print(funB)
+
+
+
+def foo(fn):
+    def bar(*args):
+        print("====1===", args)
+        n=args[0]
+        print("====2===", n*(n-1))
+        print(fn.__name__)
+        fn(n*(n-1))
+        print("*"*15)
+        return fn(n*(n-1))
+    return bar
+
+####会用foo来装饰my_test###########
+####my_test的执行效果相当于foo(my_test)
+@foo
+def my_test(a):
+    print("=====my_test===")
+print(my_test)
+my_test(10)
+my_test(6,5)
+
+
+输出结果：
+A
+B
+fkit
+<function foo.<locals>.bar at 0x7f3abe29f040>
+====1=== (10,)
+====2=== 90
+my_test
+=====my_test===
+***************
+=====my_test===
+
+
+
+
+====1=== (6, 1, 0)
+====2=== 30
+my_test
+=====my_test===
+***************
+=====my_test===
+-------------------------------------------------------------------
+如果为python定义了getter，setter等访问器，
+则可使用property()函数将它们定义成属性
+property(fget=None, fset=None, fdel=None, doc=None)
+
+
+eg1：
+class rectangle:
+    def __init__(self, wi, hi):
+        self.wi=wi
+        self.hi=hi
+    def setsize(self, size):
+        self.wi,self.hi=size
+    def getsize(self):
+        return self.wi,self.hi
+    def delsize(self):
+        self.wi,self.hi=0,0
+    size=property(getsize, setsize, delsize, "desc")
+print(rectangle.size.__doc__)
+#help(rectangle.size)
+
+
+rect=rectangle(4,3)
+print(rect.size)  #访问属性
+
+rect.size=9,7  #属性赋值
+print(rect.wi)
+print(rect.hi)
+
+del rect.size  #删除属性
+print(rect.wi)
+print(rect.hi)
+
+
+eg2:
+class user:
+    def __init__(self, first, last):
+        self.first=first
+        self.last=last
+    def getfullname(self):
+        return self.first + ',' + self.last
+    def setfullname(self, fullname):
+        li=fullname.rsplit(',')
+        self.first=li[0]
+        self.last=li[1]
+    fullname=property(getfullname, setfullname)
+u=user("zcw", "zgh")
+print(u.fullname)   #访问fullname属性
+
+u.fullname='bajie, zhu' #对fullname属性赋值
+print(u.first)
+print(u.last)
+
+某些编程语言中，类似于这二种property合成的属性被称为计算属性。
+这种属性并不真正存储任何状态，它的值其实是通过某种算法计算得到的。
+当程序对该属性赋值时，被赋的值也会被存储到其他实例变量中。
+-------------------------------------------------------------------
+使用@property装饰器来修饰方法，使之称为属性。
+
+#将方法变成属性
+class cell:
+    @property     #使用装饰器修饰方法，使方法变成属性；方法变成了属性的getter方法
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        if 'alive' in value.lower():
+            self._state='alive'
+        else:
+            self._state='dead'
+
+    @property
+    def is_dead(self):
+        return not self._state.lower() == 'alive'
+
+c = cell()
+c.state='Alive'  #修改state属性
+print(c._state)  #访问c.state属性
+print(c.is_dead) #访问is_dead属性
+
+------------------------------------------------------------
+隐藏和封装
+隐藏类似于其他语言的private，在变量前面加双下划线
+
+class user:
+    def __hide(self):
+        print('I am hide')
+    def getname(self):
+        return self.__name
+    def setname(self, name):
+        self.__name = name
+    name=property(getname, setname)
+
+    def setage(self, age):
+        self.__age = age
+    def getage(self):
+        return self.__age
+    age=property(getage, setage)
+为啥我隐藏之后，u.__name仍然可以直接访问?
+
+------------------------------------------------------------
+多继承
+
+class fruit:
+    def info(self):
+        print("I am fruit, weight:%.2f" % self.wi)
+class food:
+    def taste(self):
+        print("different food has different taste")
+class apple(fruit, food):
+    pass
+
+a=apple()
+a.wi=2.34
+a.info()
+a.taste()
+------------------------------------------------------------
+重写override, 类似c++的纯函数
+
+I can't fly...
+root@2004a:/home/test# cat test.py 
+class bird:
+    def fly(self):
+        print("I am flying...")
+class ostrich(bird):
+    def fly(self):
+        print("I can't fly...")
+
+os = ostrich()
+os.fly()
+--------------------------------------------------
+重写时调用父类的方法：
+程序显示绑定第一个参数self
+
+class baseclass:
+    def foo(self):
+        print("I am father")
+class subclass(baseclass):
+    def foo(self):
+        print('son overwrite father')
+    def bar(self):
+        self.foo()
+        baseclass.foo(self)
+sc = subclass()
+sc.bar()
+
+--------------------------------------------------
+super方法：
+
+#注释掉的方法均正确
+class employee:
+    def __init__(self, salary):
+        self.salary=salary
+    def work(self):
+        print('salary is:', self.salary)
+class customer:
+    def __init__(self, fav, address):
+        self.fav = fav
+        self.address = address
+    def info(self):
+        print('I am a customer, I love:%s, my address:%s' % (self.fav, self.address))
+class manager(employee, customer):
+    def __init__(self, salary, fav, address):
+        super().__init__(salary)
+        #super(manager, self).__init__(salary)
+        #employee.__init__(self, salary)
+        customer.__init__(self, fav, address)
+
+
+m=manager(1000, 'apple', 'wuhan')
+m.work()
+m.info()
+
+----------------------------------------------
+python的动态性：
+
+python可以为实例动态添加方法，
+使用__slots__关键字和MethodType方法
+__slots只对当前类起作用，对派生类不起作用
+
+class dog:
+    __slots__ = ('walk', 'age', 'name')   #表示支持动态添加的属性和方法
+    def __init__(self, name):
+        self.name=name
+    def test():
+        print("predefine method")
+d = dog('snoopy')
+
+from types import MethodType
+d.walk = MethodType(lambda self: print('%s is walking....' % self.name), d)
+d.age=5
+d.walk()
+
+-----------------------------------------------------------------
+type的用法:
+
+Help on class type in module __builtin__:
+class type(object)
+ |  type(object) -> the object's type
+ |  type(name, bases, dict) -> a new type
+
+
+
+
+def fn(self):
+    print("!!!fn!!!")
+dog=type("dog", (object,), dict(walk=fn, age=6))
+d=dog()
+
+print(type(d))
+print(type(dog))
+d.walk()
+print(d.age)
+
+输出：
+<class '__main__.dog'>
+<class 'type'>
+!!!fn!!!
+6
+---------------------------------------------------
+metaclass：
+如果希望创建某一批类全部具有某种特征，则可通过metaclass来实现。
+使用metaclass可以在创建类时动态修改类定义
+
+ class ItemMetaClass(type):
+    #cls代表动态修改的类
+    #name代表动态修改的类名
+    #bases代表动态修改的类的所有父类
+    #attr代表动态修改的类的所有属性和方法组成的字典
+    def __new__(cls, name, bases, attrs):
+        #为该类动态添加一个cal_price方法
+        attrs['cal_price'] = lambda self: self.price * self.discount
+        return type.__new__(cls, name, bases, attrs)
+
+class book(metaclass=ItemMetaClass):
+    __slots__ = ('name', 'price', '_discount')
+    def __init__(self, name, price):
+        self.name=name
+        self.price=price
+
+    @property
+    def discount(self):
+        return self._discount
+    @discount.setter
+    def discount(self, discount):
+        self._discount = discount
+
+class cellphone(metaclass=ItemMetaClass):
+    __slots__=('price','_discount')
+    def __init__(self, price):
+        self.price=price
+    @property
+    def discount(self):
+        return self._discount
+    @discount.setter
+    def discount(self, discount):
+        self._discount = discount
+
+b=book("crazy python", 89)
+b.discount=0.78
+print(b.cal_price())
+
+cp=cellphone(4444)
+cp.discount=0.85
+print(cp.cal_price())
+---------------------------------------------------
+多态：
+
+class canvas:
+    def draw_pic(self, shape):
+        shape.draw(self)
+class rectangle:
+    def draw(self, can):
+        print("draw rectange:%s" % can)
+class triangle:
+    def draw(self, can):
+        print("draw triangle:%s" % can)
+class circle:
+    def draw(self, can):
+        print("draw circle:%s" % can)
+
+c=canvas()
+c.draw_pic(rectangle())
+c.draw_pic(triangle())
+c.draw_pic(circle()) 
+---------------------------------------------------
+isinstance，issubclass，__bases__属性
+
+这两个函数的功能相同，isinstance的形参是变量，issubclass的形参是类名
+class A:
+    pass
+class B:
+    pass
+class C(A,B):
+    pass
+print("A's parent classes:", A.__bases__)
+print("B's parent classes:", B.__bases__)
+print("C's parent classes:", C.__bases__)
+
+输出：
+A's parent classes: (<class 'object'>,)
+B's parent classes: (<class 'object'>,)
+C's parent classes: (<class '__main__.A'>, <class '__main__.B'>)
+------------------------------------------------------------------
+Enum 
+
+#python3才有枚举
+import enum
+season=enum.Enum('season', ('spring', 'summer', 'fall', 'winter'))
+print(season.spring)
+print(season.spring.name)
+print(season.spring.value)
+
+print(),print()
+print(season(4))
+print(season['winter'])
+
+print(),print()
+print("name     item         name         value")
+for name,member in season.__members__.items():
+    print(name, "=>", member, ',', member.name, ',', member.value)
+
+输出：
+season.spring
+spring
+1
+
+season.winter
+season.winter
+
+name     item         name         value
+spring => season.spring , spring , 1
+summer => season.summer , summer , 2
+fall => season.fall , fall , 3
+winter => season.winter , winter , 4
+
+--------------------------------------------------------
+通过继承Enum来派生枚举类
+
+import enum
+class direct(enum.Enum):
+    EAST='111'
+    SOUTH='222'
+    WEST='333'
+    NORTH='444'
+    def info(self):
+        print("this is enum about direction: %s", self.value)
+print(direct.SOUTH)
+print(direct.SOUTH.name)
+print(direct.SOUTH.value)
+print(),print()
+
+print(direct['WEST'])
+print(direct('444'))
+
+print(),print()
+direct.EAST.info()
+
+print(),print()
+print("name    =>  items,  value")
+print("---------------------------------")
+for name,member in direct.__members__.items():
+    print(name, '=>', member, ',', member.value)
+-------------------------------------------------------
+枚举的构造器
+枚举也是类，因为枚举可以定义构造器
+
+
+import enum
+class gender(enum.Enum):
+    male='boy',    'strong'
+    female='girl',  'thinner'
+    
+    def __init__(self, name, desc):
+        self._name = name
+        self._desc = desc
+    @property
+    def desc(self):
+        return self._desc
+    @property
+    def name(self):
+        return self._name
+
+
+print("male's name:", gender.male.name, "male's value:   ",  gender.male.value)
+print("female's name:", gender.female.name, "female's value:  ", gender.female.value)
+
+
+
+
+
+
