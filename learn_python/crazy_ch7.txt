@@ -1,0 +1,114 @@
+所有异常对象都包含了如下几个常用属性和方法
+args
+errno
+strerror
+with_traceback
+
+def foo():
+    try:
+        fis=open("a.txt")
+    except Exception as e:
+        print(e.args)
+        print(e.errno)
+        print(e.strerror)
+foo()
+
+输出：
+(2, 'No such file or directory')
+2
+No such file or directory
+-----------------------------------------------------------
+raise
+raise默认引发RuntimeError异常
+
+#不带参数的raise
+root@2004a:/home/test# cat test.py 
+class my_exception(Exception): 
+    pass
+
+class my_test:
+    def __init__(self, price):
+        self.price = price
+    def test(self, price):
+        d=0.0
+        try:
+            d=float(price)
+        except Exception as e:
+            print("convert error:", e)
+            raise my_exception("price must be digital!")
+        if self.price > d:
+            raise 
+        price = d
+def main():
+    at  = my_test(20.4) 
+    try:
+        at.test("str")
+    except my_exception as e:
+        print("main catch exception:", e)
+main()
+
+输出：
+convert error: could not convert string to float: 'str'
+main catch exception: price must be digital!
+
+
+
+
+#带参数的raise
+class my_exception(Exception):pass
+def main():
+    first_method()
+def first_method():
+    second_method()
+def second_method():
+    third_method()
+def third_method():
+    fourth_method()
+def fourth_method():
+    raise my_exception("self defined exception!")
+main()
+-------------------------------------------------------------
+traceback：
+处理异常传播轨迹,traceback提供了两个常用方法：
+print_exec(etype, value, tb, limit, file)
+format_exec
+
+etype:指定异常类型
+value:指定异常值
+tb：指定异常的traceback信息
+limit：用于限制异常传播的层数
+file：异常传播轨迹输出到指定文件
+
+
+
+import traceback
+
+class my_exception(Exception):pass
+def main():
+    first_method()
+def first_method():
+    second_method()
+def second_method():
+    third_method()
+def third_method():
+    fourth_method()
+def fourth_method():
+    raise my_exception("self defined exception!")
+
+try:
+    main()
+except:
+    traceback.print_exc()
+    print(),print(),print()
+
+    traceback.print_exc(file=open('aaa.txt', 'a'))
+    print(),print(),print()
+
+    traceback.print_exc(limit=2)
+-------------------------------------------------------------
+滥用异常：异常和普通错误不分
+
+
+
+
+
