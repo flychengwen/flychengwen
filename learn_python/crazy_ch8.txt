@@ -1,0 +1,500 @@
+python中的特殊方法和特殊属性
+python语言采用的是约定规则，它提供了大量具有特殊意义的方法，
+这些方法可以直接使用，有些需要开发者重写。
+--------------------------------------------------------
+对象转字符串__repr__
+
+object类提供了该方法，而object类又是所有python类的父类
+__repr__是一个非常特殊的方法，它是一个"自我描述"的方法
+
+class item:
+    def __init__(self, name,price):
+        self.name=name
+        self.price=price
+    def __repr__(self):
+        return "name="+self.name+", " + "price=" + str(self.price);
+im = item('song', 4.34)
+print(im)
+print(im.__repr__)
+
+输出：
+name=song, price=4.34
+<bound method item.__repr__ of name=song, price=4.34>
+--------------------------------------------------------
+对象析构方法__del__
+当引用计数变成0时，删除对象
+
+class item:
+    def __init__(self, name,price):
+        self.name=name
+        self.price=price
+    def __del__(self):
+        print("del it")
+        
+im = item('song', 4.34)
+x = im
+del im
+--------------------------------------------------------
+__dir__方法与__dict__属性
+
+对象的__dir__方法返回 该对象内部的所有属性的序列
+dir(类对象)返回  排序后的 属性序列
+
+对象的__dict__方法返回 该对象内部的所有属性的字典
+
+#__dir__
+class item:
+    def __init__(self, name,price):
+        self.name=name
+        self.price=price
+    def info():
+        pass
+        
+im = item('song', 4.34)
+
+print(im.__dir__())
+print(),print(),print()
+
+print(dir(im))
+
+输出：
+['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'info', 'name', 'price']
+--------------------------------------------------------
+使用__getattr__等方法监听属性访问呢
+
+
+#__dict__
+class item:
+    def __init__(self, name,price):
+        self.name=name
+        self.price=price
+    def info():
+        pass
+        
+im = item('song', 4.34)
+
+print(im.__dict__['name'])
+print(im.__dict__['price'])
+print(),print(),print()
+
+im.__dict__['name'] = "keyboard"
+print(im.name)
+--------------------------------------------------------
+使用getattr等方法动态操作属性
+
+__getattribute__(self, name) //访问对象的name属性时调用
+__getattr__(self, name)   //访问不存在的对象属性时调用
+__setattr__(self, name)
+__delattr__(self, name)
+
+
+class rectangle:
+    def __init__(self, wi, hi):
+        self.wi=wi
+        self.hi=hi
+    def __setattr__(self, name, value):
+        print("settting %s attr" % name)
+        if name == 'size':
+            self.wi, self.hi = value
+        else:
+            self.__dict__[name] = value
+
+    def __getattr__(self, name):
+        print("getting %s attr" % name)
+        if name == 'size':
+            return self.wi, self.hi
+        else:
+            raise AttributeError
+
+    def __delattr__(self, name):
+        print("delete %s attr" % name)
+        self.__dict__['wi'] = 0
+        self.__dict__['hi'] = 0
+
+rect=rectangle(3,4)
+print(rect.size)
+
+rect.size=6,8
+print(rect.wi)
+
+del rect.size
+print(rect.size)
+
+rect.area=12
+----------------------------------------------------
+综合性例子：
+
+#重写__setattr__方法对设置的属性值进行检查
+class user:
+    def __init__(self, name, age):
+        self.name=name
+        self.age=age
+    def __setattr__(self, name, value):
+        if name == 'name':
+            if 2 <= len(value) <= 8:
+                self.__dict__['name'] = value
+            else:
+                raise ValueError('name length must be 2~8')
+        elif name == 'age':
+            if 10 < int(value) < 80:
+                self.__dict__['age'] = int(value)
+            else:
+                raise ValueError('age  must be 10~80')
+
+u=user('zcw', 24)
+print(u.name)
+print(u.age)
+u.age=9
+--------------------------------------------------------
+与反射相关的属性和方法
+
+程序运行过程中动态判断是否包含某个属性或方法，甚至动态设置某个属性，可以通过python的反射来实现
+java不是动态语言，但它有一个动态特征反射
+hasattr(obj, name)
+getattr(obj, name, default)
+setattr(obj, name, value, /)
+__call__属性用来区分是属性，还是方法
+
+class comment:
+    def __init__(self, detail, view_times):
+        self.detail = detail
+        self.view_times = view_times
+    def info():
+        print("a piece of simple review, content is: %s"  % self.detail)
+
+c = comment('crazy python is good', 20)
+print(hasattr(c, 'detail'))
+print(hasattr(c, 'view_times'))
+print(hasattr(c, 'info'))
+print("\n\n\n")
+
+print(getattr(c, 'detail'))
+print(getattr(c, 'view_times'))
+
+setattr(c, 'detail', 'it is rainning')
+setattr(c, 'view_times', 32)
+print(c.detail)
+print(c.view_times)
+
+
+print("\n\n\n")
+print(hasattr(c.detail, '__call__'))
+print(hasattr(c.view_times, '__call__'))
+print(hasattr(c.info, '__call__'))
+print(hasattr(c.__init__, '__call__'))
+--------------------------------------------------------
+与序列相关的特殊方法
+
+__len__(self)
+__getitem__(self, item)
+__contains__(self, item)
+__setitem__(self, key, value)
+__delitem__(self, key)
+
+
+def check_key(key):
+    if not isinstance(key, int): raise TypeError('index must be integer')
+    if key < 0: raise IndexError('index must be negative')
+    if key >= 26**3: raise IndexError('index must be less than %d' % 26**3)
+
+class StringSeq:
+    def __init__(self):
+        self.__changed={}  #store modified elements
+        self.__deleted=[]  #store deleted elements
+    def __len__(self):
+        return 26**3
+    def __getitem__(self, key):
+        check_key(key)
+        if key in self.__changed:
+            kk = self.__changed[key]
+            return kk
+        if key in self.__deleted:
+            print("key has delted!")
+            return None
+        kk = key
+        three = kk//(26*26)
+        two = (kk - three*26*26)//26
+        one = kk - three*26*26 - two*26
+        return chr(65+three)+chr(65+two)+chr(65+one)
+    def __setitem__(self, key, value):
+        check_key(key)
+        self.__changed[key]=value
+    def __delitem__(self, key):
+        check_key(key)
+        if key in self.__changed:
+            del self.__changed[key]
+            self.__deleted.append(key)
+        else:
+            print("key:",key," doesn't exist!")
+sq = StringSeq()
+print(len(sq))
+print(sq[26*26])
+print("\n\n")
+
+sq[3*26*26+5*26+11]='zhangsan'
+sq[9*26*26+4*26+24]='wangwu'
+print(sq[3*26*26+5*26+11])
+print(sq[9*26*26+4*26+24])
+print("\n\n")
+
+del sq[3*26*26+5*26+11]
+print(sq[3*26*26+5*26+11])
+--------------------------------------------------------
+与迭代器相关的特殊方法
+__iter__(self)      #返回迭代器
+__reversed__(self)  #reversed方法的底层实现
+
+#该类实现了__iter__方法，该方法返回self，
+#因此它要求该类必须提供__next__方法
+#程序使用__len属性控制数列的剩余长度
+class fibs:
+    def __init__(self, len):
+        self.first=0
+        self.sec=1
+        self.__len=len
+
+    def __next__(self):
+        if self.__len == 0:
+            raise StopIteration
+        self.first,self.sec = self.sec, self.first+self.sec
+        self.__len -= 1
+        return self.first
+    def __iter__(self):
+        return self
+
+ff = fibs(10)
+print(next(ff))
+for e in ff:
+    print(e, end='\t')	
+--------------------------------------------------------
+扩展列表，元组和字典
+很多时候，如果程序明确需要一个特殊的列表，元组或字典，有两种选择：
+自己实现序列，迭代器等各种方法，自己来实现这个特殊类
+扩展系统已有的列表，元组 或 字典
+
+#继承dict类
+class my_dict(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    def getkeys(self, val):
+        result=[]
+        for k,v in self.items():
+            if v == val: result.append(k)
+        return result
+d = my_dict(cn=92, math=89, en=92)
+print(d.getkeys(92))
+print("\n\n")
+
+d['programming']=92
+print(d.getkeys(92))
+--------------------------------------------------------
+生成器函数和生成器对象
+
+生成器和迭代器的区别：
+迭代器通常是先定义一个迭代器类，然后通过创建实例来创建迭代器；
+而生成器则是先定义一个包含yield语句的函数，然后通过调用该函数来创建生成器。
+它们都有next方法
+
+#eg1
+def test(val, step):
+    print('------begin function-----------')
+    cur=0
+    for i in range(val):
+        cur += i*step
+        yield cur
+t=test(10,2)
+print('================')
+print(next(t))
+print(next(t))
+
+
+#eg2
+def test(val, step):
+    print('------begin function-----------')
+    cur=0
+    for i in range(val):
+        cur += i*step
+        yield cur
+t=test(10,2)
+print(list(t))
+print('================')
+t=test(10,3)
+print(tuple(t))
+--------------------------------------------------------
+生成器方法和使用生成器
+
+为了实现生成器与外部程序动态的交换数据，需要借助于生成器的send()方法，
+该方法与前面示例中所使用的next函数的功能非常相似，它们都用于获取生成器所生成的下一个值，
+并将生成器冻结在yield语句处
+
+
+归纳起来两句话：
+外部程序通过send方法来发送数据
+生成器函数使用yield语句接收数据
+
+def mygen(val):
+    i=0
+    out_val=None
+    while True:
+        out_val = (yield out_val**2) if out_val is not None else (yield i**2)
+    if out_val is not None: print("=============%d" % out_val)
+    i+=1
+
+gg=mygen(5)
+print(gg.send(None))
+print(next(gg))
+print('-------------------')
+print(gg.send(9))
+print(next(gg))
+--------------------------------------------------------
+与数值运算相关的特殊方法
+object.__add__(self, other)
+object.__sub__(self, other)
+object.__mul__(self, other)
+object.__matmul__(self, other)
+...
+object.__radd__(self, other)
+object.__rsub__(self, other)
+...
+object.__iadd__(self, other)
+object.__isub__(self, other)
+...
+
+与比较运算相关的特殊方法
+object.__lt__(self, other)
+object.__ge__(self, other)
+...
+
+class Rectangle:
+    def __init__(self, wi, hi):
+        self.wi=wi
+        self.hi=hi
+    def setsize(self, size):
+        self.wi,self.hi=size
+    def getsize(self):
+        return self.wi,self.hi
+    size=property(getsize, setsize)
+    def __iadd__(self, other):
+        if not isinstance(other, int) and not isinstance(other, float):
+            raise TypeError("+= must be numeric")
+        return Rectangle(self.wi+other, self.hi+other)
+    def __radd__(self, other):
+        if not isinstance(other, int) and not isinstance(other, float):
+            raise TypeError("+= must be numeric")
+        return Rectangle(self.wi+other, self.hi+other)
+    def __add__(self, other):
+        if not isinstance(other, Rectangle):
+            raise TypeError("+= must be numeric")
+        return Rectangle(self.wi+other.wi, self.hi+other.hi)
+    def __ge__(self, other):
+        if not isinstance(other, Rectangle):
+            raise TypeError('>= require destination must be Rectangle!')
+        return True if self.wi*self.hi >= other.wi*other.hi else False
+    def __repr__(self):
+        return 'Rectangle(wi=%g, hi=%g)' % (self.wi, self.hi)
+
+
+
+print("=====test __add__=======")
+r1=Rectangle(4,5)
+r2=Rectangle(3,3)
+r3=r1+r2
+print(r3)
+print("=====test __radd__=======")
+r1=Rectangle(4,5)
+r = 2+r1
+print(r)
+
+print("=====test __iadd__=======")
+r=Rectangle(4,5)
+r += 2
+print(r)
+
+print("=====test __ge__=======")
+r1=Rectangle(4,5)
+r2=Rectangle(3,4)
+print(r1 >= r2)
+
+输出：
+=====test __add__=======
+Rectangle(wi=7, hi=8)
+=====test __radd__=======
+Rectangle(wi=6, hi=7)
+=====test __iadd__=======
+Rectangle(wi=6, hi=7)
+=====test __ge__=======
+True
+--------------------------------------------------------
+与单目运算符相关的特殊方法
+object.__neg__(self)
+object.__invert__(self)
+...
+
+与类型转换相关的特殊方法
+object.__bytes__(self)
+object.__int__(self)
+object.__float__(self)
+...
+
+class Rectangle:
+    def __init__(self, wi, hi):
+        self.wi=wi
+        self.hi=hi
+    def setsize(self, size):
+        self.wi,self.hi=size
+    def getsize(self):
+        return self.wi,self.hi
+    size=property(getsize, setsize)
+
+    def __neg__(self):
+        self.wi,self.hi=self.hi,self.wi
+    def __int__(self):
+        return int(self.wi*self.hi)
+    def __repr__(self):
+        print("wi=%d,hi=%d" % (self.wi,self.hi))
+        return 'Rectangel(wi=%g,hi=%g)'  % (self.wi, self.hi)
+r = Rectangle(4,5)
+print("======test int=========")
+print(int(r))
+print(r)
+print("======test neg=========")
+-r
+print(r)
+
+输出：
+======test int=========
+20
+wi=4,hi=5
+Rectangel(wi=4,hi=5)
+======test neg=========
+wi=5,hi=4
+Rectangel(wi=5,hi=4)
+
+--------------------------------------------------------
+与常见的内建函数相关的特殊方法
+object.__format__(self, format_spec)
+object.__hash__(self)
+object.__abs__(self)
+object.__round__(self[, ndigits])
+object.__trunc__(self)
+object.__floor__(self)
+object.__ceil__(self)
+
+class rectangle:
+    def __init__(self, wi, hi):
+        self.wi=wi
+        self.hi=hi
+    def setsize(self, size):
+        self.wi, self.hi=size
+    def getsize(self):
+        return self.wi, self.hi
+    size=property(getsize, setsize)
+    def __round__(self, ndigits=0):
+        self.wi,self.hi=round(self.wi, ndigits), round(self.hi, ndigits)
+        return self
+    def __repr__(self):
+        return 'Rectangle(wi=%g, hi=%g)'  % (self.wi, self.hi)
+r = rectangle(4.13456, 5.56789)
+print(r)
+result=round(r, 3)
+print(r)

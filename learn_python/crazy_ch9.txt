@@ -1,0 +1,78 @@
+
+------------------------------------------
+导入python模块
+
+import sys
+print(sys.argv[1])
+
+import sys as s
+print(s.argv[1])
+
+import sys,os
+print(sys.argv[0])
+print(os.sep)
+
+from sys import argv
+print(argv[0])
+
+from sys import argv as v
+print(v[0])
+
+#linux下将执行失败
+from sys import argv as v, winver as wv
+print(v[0])
+print(wv)
+------------------------------------------------
+定义模块
+'''为模块编写的说明文档'''
+为模块编写说明文档和测试代码
+
+print('this is module1')
+my_book='crazy python'
+def say_hi(pp):
+    print('%s, hello, welcome learn python'  % pp)
+class person:
+    def __init__(self, name):
+        self.name=name
+    def walk(self):
+        print("%s is walking..."  % self.name)
+    def __repr__(self):
+        return 'my name is:%s'  % self.name
+print("=========test code=================")
+def test_my_book():
+    print(my_book)
+def test_say_hi():
+    say_hi('sun wu kong')
+    say_hi(person('Charlie'))
+def test_person():
+    u=person('zcw')
+    u.walk()
+    print(u)
+
+test_my_book()
+test_say_hi()
+test_person()
+------------------------------------------------
+使用环境变量指定模块加载路径
+vi  /etc/profile
+PYTHONPATH=.:/home/test
+export  PYTHONPATH
+source /etc/profile
+------------------------------------------------
+默认的模块加载路径
+import sys,pprint
+pprint.pprint(sys.path)
+
+['/home/test',
+ '/usr/lib/python38.zip',
+ '/usr/lib/python3.8',
+ '/usr/lib/python3.8/lib-dynload',
+ '/usr/local/lib/python3.8/dist-packages',
+ '/usr/lib/python3/dist-packages']
+---------------------------------------------------
+模块的__all__变量
+包和模块的关系
+定义包
+使用包管理包内模块
+查看模块内容
+查看模块内容的帮助信息和源文件路径
