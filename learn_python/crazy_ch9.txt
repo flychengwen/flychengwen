@@ -69,10 +69,163 @@ pprint.pprint(sys.path)
  '/usr/lib/python3.8/lib-dynload',
  '/usr/local/lib/python3.8/dist-packages',
  '/usr/lib/python3/dist-packages']
+ 
+root@2004a:~# python3 -V
+Python 3.8.10
+
+
+cd /usr/lib/python3/dist-packages
+root@2004a:/usr/lib/python3/dist-packages# cat print_shape.py 
+li=['python', 'java', 'swift']
+def print_triangle(n):
+    if n<=0:
+        raise ValueError('n must be gt 0')
+    for i in range(n):
+        #print(i)
+        print(' '*(n-i-1), end=' ')
+        print('*'*(2*i+1))
+def test_print_triangle():
+    print_triangle(7)
+    print("\n\n")
+    print_triangle(4)
+    print("\n\n")
+    print_triangle(3)
+if __name__ == '__main__': test_print_triangle() 
+
+root@2004a:/# python3
+>>> import print_shape
+>>> print(print_shape.__doc__)
+None
+>>> print_shape.li[2]
+'swift'
+>>> print_shape.print_triangle(4)
+ 
+---------------------------------------------------
+导入模块的本质
+会执行模块中的可执行语句
+会产生一个模块变量，类型为module，将整个模块的内容赋值给它
+
+vi /etc/profile
+PYTHONPATH=/home/test
+export  PYTHONPATH
+source /etc/profile
+
+root@2004a:/home/test# cat fk_module.py 
+print("this is fk_module")
+name="fkit"
+def hello():
+    print("hello, python")
+
+env | grep PYTHONPATH
+root@2004a:/# cat test.py 
+import fk_module
+print(type(fk_module))
+print("===================")
+print(fk_module)
+print(fk_module.name)
 ---------------------------------------------------
 模块的__all__变量
+不希望导出所有的变量和方法，使用__all__列出允许被导出的属性和方法
+
+vi /etc/profile
+PYTHONPATH=/home/test
+export  PYTHONPATH
+source /etc/profile
+
+root@2004a:/home/test# cat all_module.py 
+def hello():
+    print("hello, python")
+def world():
+    print("python3 world is funny")
+def test():
+    print("--test--")
+__all__ = ['hello', 'world']
+
+
+root@2004a:/# cat test.py 
+from all_module import *
+
+hello()
+world()
+#test()
+root@2004a:/# 
+---------------------------------------------------
 包和模块的关系
-定义包
-使用包管理包内模块
+包就是文件夹，该文件夹下包含了多个模块源文件
+
+root@2004a:/home/test# tree
+.
+└── first_package
+    ├── arithmetic_chart.py
+    ├── billing.py
+    ├── __init__.py
+    ├── print_shape.py
+	
+root@2004a:/home/test/first_package# cat arithmetic_chart.py 
+def print_arithmetic_chart(n):
+    for i in range(n):
+        for j in range(i+1):
+            print('%d * %d = %2d' %((j+1), (i+1), (j+1)*(i+1)), end=' ')
+        print(' ')
+root@2004a:/home/test/first_package# 
+root@2004a:/home/test/first_package# cat __init__.py 
+'''this is first example'''
+print('this is first_package')
+root@2004a:/home/test/first_package# 
+root@2004a:/home/test/first_package# cat arithmetic_chart.py 
+def print_arithmetic_chart(n):
+    for i in range(n):
+        for j in range(i+1):
+            print('%d * %d = %2d' %((j+1), (i+1), (j+1)*(i+1)), end=' ')
+        print(' ')
+root@2004a:/home/test/first_package# 
+root@2004a:/home/test/first_package# cat billing.py 
+class Item:
+    def __init__(self, price):
+        self.price=price
+    def __repr__(self):
+        return 'Item[price=%g]' % self.price
+root@2004a:/home/test/first_package# 
+root@2004a:/home/test/first_package# cat print_shape.py 
+def print_blank_triangle(n):
+    if n<=0:
+        raise ValueError('n must be gt 0')
+    for i in range(n):
+        print(' '*(n-i-1), end='')
+        print('*'*(2*i+1))
+root@2004a:/home/test/first_package# 
+
+
+root@2004a:/# cat test.py 
+import first_package    #实际上就是导入包下的__init__.py文件
+import first_package.print_shape
+from first_package import billing
+import first_package.arithmetic_chart
+
+first_package.print_shape.print_blank_triangle(5)
+ii = billing.Item(4.5)
+print(ii)
+first_package.arithmetic_chart.print_arithmetic_chart(9)
+---------------------------------------------------
 查看模块内容
+>>> string.__all__
+>>> import string
+>>> dir(string)
+>>> [e for e in dir(string) if not e .startswith('_')] 
+
 查看模块内容的帮助信息和源文件路径
+>>> help(string.capwords)
+>>> print(string.capwords.__doc__)
+>>> string.capwords('abc xyz')
+
+---------------------------------------------------
+使用__file__属性查看模块的源文件路径
+>>> string.__file__
+'/usr/lib/python3.8/string.py'
+
+
+
+
+
+
+

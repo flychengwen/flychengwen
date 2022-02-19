@@ -1,0 +1,84 @@
+
+---------------------------------------------------------
+sys
+sys.stdout
+sys.stdin
+sys.stderr
+
+>>> import sys
+>>> [e for e in dir(sys) if not e.startswith('_')]
+
+
+
+import sys
+print(sys.byteorder)
+print(sys.copyright)
+print(sys.executable)
+print(sys.getfilesystemencoding())
+print(sys.maxsize)
+print(sys.platform)
+print(sys.version)
+#print(sys.winver)
+---------------------------------------------------------
+os
+os模块的各种进程管理函数
+os.abort()
+os.execl(path, arg0, arg1,...)，类似的含有execle, execlv
+os.forkptyt()     //fork一个子进程
+os.kill(pid, sig) //发送sig信号到pid对应的进程
+os.killpg(pgid, sig) 
+os.popen(cmd, mode='r', buffering=-1) //打开管道，r为只读，rw为读写，返回的是字符串
+os.spawnl(mode, path,...)，类似的还有os.spawnle, os.spawnlp
+os.startfile(path，operation) //对指定文件执行operation操作，默认是open
+os.system(command)  //相当于linux的systemn命令
+
+
+root@2004a:/home/zhangsan# cat hello.py 
+import os
+print(os.name)
+print(os.getenv('PYTHONPATH'))
+print(os.getlogin())
+print(os.getpid())
+print(os.getppid())
+print(os.cpu_count())
+print(os.sep)       //磁盘路径分隔符
+print(os.pathsep)   //多条路径分隔符，比如环境变量PATH
+print(os.linesep)   //换行符
+print(os.urandom(5))
+
+
+root@2004a:/home/test# cat test.py 
+import sys
+sys.path.append('/home/zhangsan')  //自动修改模块加载路径
+import hello   //导入hello模块
+---------------------------------------------------------
+random
+---------------------------------------------------------
+time
+---------------------------------------------------------
+json
+---------------------------------------------------------
+正则表达式
+---------------------------------------------------------
+set和frozenset
+---------------------------------------------------------
+deque
+---------------------------------------------------------
+堆操作
+---------------------------------------------------------
+ChainMap对象
+---------------------------------------------------------
+Counter
+---------------------------------------------------------
+defaultdict
+---------------------------------------------------------
+命名元组
+---------------------------------------------------------
+OrderDict
+---------------------------------------------------------
+itertools
+---------------------------------------------------------
+functools
+---------------------------------------------------------
+
+
