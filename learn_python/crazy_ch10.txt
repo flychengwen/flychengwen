@@ -53,10 +53,85 @@ sys.path.append('/home/zhangsan')  //自动修改模块加载路径
 import hello   //导入hello模块
 ---------------------------------------------------------
 random
+
+import random
+print(random.random())
+print(random.uniform(2.5, 10.0))
+print(random.expovariate(1/5)) #生成呈指数分布的伪随机数
+print(random.randrange(10))
+print(random.randrange(0, 101, 2))
+print(random.choice(['c++', 'java', 'c']))
+
+li=['python3', 'lua', 'java2', 'c++']
+random.shuffle(li)
+print(li)
+print(random.sample([10,20,30,40,50,60,70,80], k=4))
 ---------------------------------------------------------
 time
+
+import time
+print(time.asctime())
+print(time.asctime((2022, 2, 20, 21, 11, 1, 0, 0, 0)))
+print(time.ctime(30));
+print(time.gmtime(30));  #sec -> struct_time
+print(time.gmtime());    # now sec -> struct_time
+print(time.localtime(30));
+print(time.mktime((2022, 2, 20, 21, 11, 1, 0, 0, 0)));
+print(time.perf_counter());
+print(time.process_time());
+print(time.sleep(10));
+print(time.strftime('%Y-%m-%d %H:%M:%S'));
+
+st='2018年3月20日'
+print(time.strptime(st, '%Y年%m月%d日'));
+print(time.time());
+print(time.timezone);
 ---------------------------------------------------------
 json
+
+#example1
+import json
+s = json.dumps(['zcw', {'fav': ('coding', None, 'game', 25)}])
+print(s)
+s1 = json.dumps('//')
+print(s1)
+s2=json.dumps([1,2,3,{'x':5, 'y':7}], separators=(',', ':'))
+#s2=json.dumps([1,2,3,{'x':5, 'y':7}])
+print(s2)
+s3=json.dumps({'python':5, 'c++':7}, sort_keys=True, indent=4)
+print(s3)
+
+s4=json.JSONEncoder().encode({"names":('sun', 'yong')})
+print(s4)
+
+f=open('a.json', 'w')
+json.dump(['kate', {'python':'exec'}], f)
+
+#example2
+import json
+def as_complex(dct):
+    if '__complex__' in dct:
+        return complex(dct['real'], dct['img'])
+    return dct
+
+res = json.loads('{"__complex__":true, "real":1, "img":2}', object_hook=as_complex)
+print(res)
+
+f=open('a.json')
+res=json.load(f)
+print(res)
+
+#example3
+import json
+class ComplexEncoder(json.JSONEncoder):
+        def default(self, obj):
+                if isinstance(obj, complex):
+                        return {"__complex__":'true', 'real':obj.real, 'img':obj.imag}
+                return json.JSONEncoder.default(self, obj)
+s1 = json.dumps(2+1j, cls=ComplexEncoder)
+print(s1)
+s2=ComplexEncoder().encode(3+2j)
+print(s2)
 ---------------------------------------------------------
 正则表达式
 ---------------------------------------------------------
