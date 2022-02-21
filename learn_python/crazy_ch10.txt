@@ -134,26 +134,525 @@ s2=ComplexEncoder().encode(3+2j)
 print(s2)
 ---------------------------------------------------------
 正则表达式
----------------------------------------------------------
-set和frozenset
+
+######example1#############
+import re
+p=re.compile('abc')
+p.search('www.abc.com')
+re.search('abc', 'wwww.abc.com') #similar to strstr
+re.match('abc', 'www.abc.com')   #similar to strcmp
+print('----------------\n')
+m1 = re.match('www', 'www.fkit.org')
+print(m1.span())
+print(m1.group())
+print(re.match('fkit', 'www.fkit.com'))
+print('----------------\n')
+m2 = re.search('www', 'www.fkit.com')
+print(m2.span())
+print(m2.group())
+m3 = re.search('fkit', 'www.fkit.com')
+print(m3.span())
+print(m3.group())
+print('----------------------\n')
+print(re.findall('fkit', 'fkit is very good, fkit.org is my fav', re.I)) # re.I 表示忽略大小写
+it = re.finditer('fkit', 'fkit is very good, fkit.org is my fav', re.I)
+for e in it:
+    print(str(e.span()) + '-->' + e.group())
+print('----------------------\n')
+my_date = '2008-08-18'
+print(re.sub(r'-', '/', my_date))
+print(re.sub(r'-', '/', my_date, 1))
+
+#########example2#################
+import re
+print(re.split(', ', 'fkit, fkjava, crazyit'))
+print(re.split(', ', 'fkit, fkjava, crazyit'),1)
+print(re.split('a', 'fkit, fkjava, crazyit'))
+print(re.split('x', 'fkit, fkjava, crazyit'))
+print('--------------------\n')
+print(re.escape(r'www.crazyit.org is good, i love it!')) //输出对特殊字符转义
+print(re.escape(r'A-Zand0-9?'))  //输出对特殊字符转义
+print('---------------------\n')
+patt = re.compile('fkit')
+print(patt.match('www.fkit.org', 4).span())
+print(patt.match('www.fkit.org', 4, 6)
+print(patt.fullmatch('www.fkit.org', 4, 8)
+
+贪婪模式和勉强模式
+不同的正则表达式带来不同的匹配效果
+比如?匹配0-1次，效果为勉强模式
+又不如+能匹配多少就匹配多少，效果为贪婪模式
+###########example3#######################
+import re
+m1=re.search(r'@.+\.', 'sun@fkit.com.cn')
+m2=re.search(r'@.+?\.', 'sun@fkit.com.cn')
+print(m1.span(), ' ', m1.group())
+print(m2.span(), ' ', m2.group())
+root@2004a:/home/test# python3 test.py 
+(3, 13)   @fkit.com.
+(3, 9)   @fkit.
+root@2004a:/home/test# 
+---------------------------------------------------------set和frozenset
+容器相关类除了list，tuple，dict，还有set，deque 
+set不记录元素的顺序，且元素不允许重复
+set支持集合运算：
+-或者difference   #不改变集合元素
+difference_update #改变集合元素
+&或者intersection
+intersection_update #改变集合元素 
+union  #计算两个集合的并集，不改变集合本身
+update #计算两个集合的并集，改变集合本身
+
+当元素不需要改变时，用 frozenset比set更安全
+
+
+#example
+e=set(range(5))
+f=set(range(3,7))
+un = e.union(f)
+print(un)
+e.update(f)
+print(e)
 ---------------------------------------------------------
 deque
+
+from collections import deque
+st = deque(('java', 'c++'))
+st.append('go')
+st.append('swift')
+st.append('java')
+print(st.pop())
+print(st.pop())
+print('---------------------\n')
+q = deque(('kate', 'python'))
+q.append('erlang')
+q.append('swift')
+print('elements in q:', q)
+print(q.popleft())
+print(q.popleft())
+print(q)
+print('---------------------\n')
+qq=deque(range(5))
+qq.rotate()                  #rotate和循环移位差不多
+print("elements in qq:", qq)
+qq.rotate()
+print("elements in qq:", qq
 ---------------------------------------------------------
 堆操作
+
+heappush
+heappop
+heapify   #将堆属性应用到列表上
+heapreplace  #将堆重最小元素弹出，并将元素x入堆
+merge  #将多个有序堆合并成要给大堆
+heappushpop(heap, item) #将item入堆，然后弹出并返回堆重最小的元素
+nlargest   #返回最大元素
+nsmallest  #返回最小元素
+
+from heapq import *
+li=list(range(10))
+li.append(0.5)        #append是列表的方法
+print('my_data:', li)
+heapify(li)           #让列表具有堆及堆排序的特性
+print('my_data:', li)
+heappush(li, 7.2)     #heappush是堆的方法
+print('my_data:', li)
 ---------------------------------------------------------
-ChainMap对象
+collections包的ChainMap对象
+
+#将三个字典链在一起，链的顺序，决定优先级
+from collections import ChainMap
+a={'kot':90, 'python':86}
+b={'go':89, 'python':92}
+c={'swift':77, 'go':75}
+cm = ChainMap(a,b,c)
+print(cm)
+print(cm['kot'])
+print(cm['python'])
+print(cm['go'])
+
+
+from collections import ChainMap
+import os,argparse
+defaults = {'color':'blue', 'user':'yutong'}
+parser = argparse.ArgumentParser()
+parser.add_argument('-u', '--user')
+parser.add_argument('-c', '--color')
+namespace = parser.parse_args()
+d = {k:v for k,v in vars(namespace).items() if v}
+cm = ChainMap(d, os.environ, defaults)
+print(cm['color'])
+print(cm['user'])
+print(cm['HOME'])
+root@2004a:/home/test# 
+python3 test.py 
+python3 test.py  -u lisi -c red
+
 ---------------------------------------------------------
-Counter
+collections包的Counter
+自动统计容器各元素出现的次数
+
+###example1#####
+from collections import Counter
+c1=Counter()
+c2=Counter('zcw')
+c3=Counter(['python', 'swift', 'go', 'swift', 'go', 'swift'])
+c4=Counter({'red':4, 'blue':2})
+c5=Counter(python=4, swift=9)
+print(c1)
+print(c2)
+print(c3)
+print(c4)
+print(c5)
+
+root@2004a:/home/test# python3 test.py 
+Counter()
+Counter({'z': 1, 'c': 1, 'w': 1})
+Counter({'swift': 3, 'go': 2, 'python': 1})
+Counter({'red': 4, 'blue': 2})
+Counter({'swift': 9, 'python': 4})
+root@2004a:/home/test# 
+
+
+###example2#####
+from collections import Counter
+
+cnt=Counter()
+for word in ['aa', 'bb', 'cc', 'bb', 'cc', 'dd', 'bb']:
+    cnt[word] += 1
+print(cnt)
+print(list(cnt.elements()))
+print(cnt.most_common(2))  #top 2
+
+
+c=Counter(a=4,b=11,c=0, d=-2)
+d=Counter(a=1,b=3,c=3, d=4)
+c.subtract(d)
+print(c)
+print('---------------------------')
+e = Counter({'x':2, 'y':3, 'z':-4})
+del e['y']
+print(e)
+print(e['w'])
+del e['w']
+print(e['w'])
+
+
+###example3#########
+from collections import Counter
+c = Counter(python=4, swift=2, kot=3, go=-2)
+print(sum(c.values()))
+print(list(c))
+print(set(c))
+print(dict(c))
+print('------------------')
+pp=c.items()
+print(pp)
+c2=Counter(dict(pp))
+print(c2)
+print(c.most_common()[:-4:-1])
+c.clear()
+print(c)
+print('------------------')
+c=Counter(a=3,b=1,c=-1)
+d=Counter(a=1,b=-2,d=3)
+print(c+d)   #只保留出现次数为正的元素
+print(c-d)
+print(c&d)
+print(c|d)
+print(+c)
+print(-d)   #只保留出现次数为负的元素，并把它变成正的
 ---------------------------------------------------------
 defaultdict
+和dict差不多，但dict没有值会报错，defaultdict不会
+
+from collections import defaultdict
+d={}
+md=defaultdict(int)
+print(md['a'])
+#print(d['a'])
+print('-------------------------------')
+from collections import defaultdict
+s=[('python', 1), ('swift', 2), ('python', 3), ('swift', 4), ('python', 9)]
+d = defaultdict(list)
+for k,v in s:
+    d[k].append(v)
+print(list(d.items())
+
+root@2004a:/home/test# python3 test.py 
+0
+[('python', [1, 3, 9]), ('swift', [2, 4])]
 ---------------------------------------------------------
 命名元组
+nametuple()是一个工厂函数
+
+###example1######
+from collections import namedtuple
+pt=namedtuple('Point', ['x', 'y'])  #定义命名元组类
+p = pt(11, y=22)
+print(p[0]+p[1])
+a,b=p
+print(a,b)
+print(p.x+p.y)
+print(p)
+
+
+除了基本用法，还提供如下方法和属性
+_make(iterable)
+_asdict()
+_replace(**kwargs)
+_source
+_fields
+
+###example2######
+from collections import namedtuple
+pt=namedtuple('Point', ['y', 'x'])
+
+my_data = ['North', 'East']
+p2 = pt._make(my_data)
+print(p2)
+print(p2._asdict())
+p2._replace(y='south')
+print(p2)
+print(p2._fields)
+print('-----------------------------')
+Color = namedtuple('Color', 'red green blue')
+Pixel = namedtuple('Pixel', pt._fields+Color._fields)
+pix = Pixel(11,22,128, 255, 0)
+print(pix)
 ---------------------------------------------------------
 OrderDict
+有序字典,取决于添加顺序
+popitem方法
+move_to_end方法
+
+#example1
+from collections import OrderedDict
+d1=OrderedDict(b=5,c=2,a=8)
+print(d1)
+print('-----------')
+d=OrderedDict()
+d['python']=89
+d['swift']=92
+d['kot']=97
+d['go']=87
+for k,v in d.items():
+    print(k,v)
+	
+
+#example2 
+from collections import OrderedDict
+my_data = {'python':20, 'swift':32, 'kot':43, 'go':25}
+d1=OrderedDict(sorted(my_data.items(), key=lambda t:t[0]))
+d2=OrderedDict(sorted(my_data.items(), key=lambda t:t[1]))
+print(d1)
+print(d2)
+print(d1==d2)
+
+
+#example3 
+from collections import OrderedDict
+d = OrderedDict.fromkeys('abcde')
+print(d)
+d.move_to_end('b')
+print(d.keys())
+d.move_to_end('b', last=False)
+print(d)
+print(d.popitem()[0])
+print(d.popitem(last=False)[0])
 ---------------------------------------------------------
 itertools
+itertools包含了一些用于生成迭代器的函数
+count(start, step)
+cycle生成无限循环
+repeat生成无限重复迭代器
+
+#example1
+import itertools as it
+for e in it.count(10, 3):
+    print(e)
+    if e > 20:
+        break
+print("-------------")
+nr=0
+for e in it.cycle(['python', 'lua', 'ruby']):
+    print(e)
+    nr += 1
+    if nr > 7:
+        break
+print("-------------")
+for e in it.repeat('c++', 4):
+    print(e)
+
+
+accumulate(p, function): 如果没有指定function，则生成无限迭代序列p0， p0+p1, p0+p1+p2, ...
+                         否则根据function生成迭代序列
+chain: 链在一起
+compress: 根据selectors序列或逻辑表，从数据序列中选出元素
+dropwhile和takewhile功能正好相反
+starmap 类似hardoop的map函数
+zip_longest(iter1， iter2)根据iter1，iter2生成新的迭代序列
+						 						
+#example2
+import itertools as it
+for e in it.accumulate(range(1,8)):
+    print(e, end=', ')
+print('\n-------------')
+for e in it.accumulate(range(1,8), lambda x,y:x*y):
+    print(e, end=', ')
+print('\n-------------')
+for e in it.chain(['a', 'b'], ['1', '2']):
+    print(e, end=', ')
+print('\n-------------')
+for e in it.compress(['a','b','c','d'], [0,1,1,0]):
+    print(e, end=', ')
+print('\n-------------')
+for e in it.dropwhile(lambda x:len(x)<4, ['a', 'b', 'kotlin', 'x', 'y']):
+    print(e, end=', ')
+print('\n-------------')
+for e in it.takewhile(lambda x:len(x)<4, ['a', 'b', 'kotlin', 'x', 'y']):
+    print(e, end=', ')
+print('\n-------------')
+for e in it.filterfalse(lambda x:len(x)<4, ['a', 'b', 'kotlin', 'x', 'y']):
+    print(e, end=', ')
+    print('\n-------------')
+for e in it.starmap(pow, [(2,5), (3,2), (10,3)]):
+    print(e, end=', ')
+print('\n-------------')
+for e in it.zip_longest('ABCD', 'xy', fillvalue='-'):
+    print(e, end=', ')
+print('\n')
+
+
+#example3 
+import itertools as it
+for e in it.product('AB', 'CD'):
+    print(' '.join(e), end='\t')
+print("\n---------------")
+for e in it.product('AB', repeat=3):
+    print(' '.join(e), end='\t')
+print("\n----------------")
+for e in it.permutations('ABCD', 2):
+    print(' '.join(e), end='\t')
+print("\n----------------")
+for e in it.combinations('ABCD', 2):
+    print(' '.join(e), end='\t')
+print("\n-------------------")
+for e in it.combinations_with_replacement('ABCD', 2):
+    print(' '.join(e), end='\t')
+print("\n")
 ---------------------------------------------------------
 functools
+functools模块重主要包含了一些函数装饰器和便捷的功能函数
+
+
+#example1 
+from functools import *
+print(reduce(lambda x,y: x+y,range(6)))
+print(reduce(lambda x,y: x+y,range(6), 110))
+print('\n----------------')
+class User:
+    def __init__(self, name):
+        self.name=name
+    def __repr__(self):
+        return 'name=%s' % self.name
+def old_cmp(u1, u2):
+    return len(u1.name) - len(u2.name)
+my_data = [User('zcw'), User('lipeng'), User('zhaoliu'), User('sunyang')]
+print(my_data)
+print('---------------------------')
+@lru_cache(maxsize=32)
+def factorial(n):
+    if n == 1:
+        return 1
+    else:
+        return n*factorial(n-1)
+print(factorial(5))
+print(factorial(3))
+print('----------------------')
+print(int('12345'))
+basetwo = partial(int, base=2)
+print(basetwo('10010'))
+print(int('10010', 2))
+
+
+#example2 
+from functools import *
+class cell:
+    def __init__(self):
+        self.isalive=False
+    @property
+    def alive(self):
+        return self.isalvie
+    def set_state(self, state):
+        self.isalive=bool(state)
+    set_alive=partialmethod(set_state, True)
+    set_dead=partialmethod(set_state, False)
+
+c=cell()
+print(c.isalive)
+c.set_alive()
+print(c.isalive)
+c.set_dead()
+print(c.isalive)
+
+
+@total_ordering装饰器修饰了该user类，
+这样该装饰器将会为该类提供__gt__, __ge__, __le__, __ne__这些比较方法
+#example3
+@total_ordering
+class user:
+    def __init__(self, name):
+        self.name =name
+    def __repr__(self):
+        return "name=%s"  % slef.name
+    def __is_valid_operand(self, other):
+        return NotImplemented
+    def __eq__(self, other):
+        return self.name.lower() == other.name.lower()
+    def __lt__(self, other):
+        return self.name.lower() < other.name.lower()
+print(user.__gt__)
+
+
+如果test函数的第一个参数为int，
+则会转而调用_函数
+#example4 
+from functools import *
+@singledispatch
+def test(arg, verbose):
+    if verbose:
+        print("default param: ", end=" ")
+    print(arg)
+
+#限制test函数的第一个参数为int类型的函数版本
+@test.register(int)
+def new_func(argu, verbose):
+    if verbose:
+        print("整型参数为: ", end=" ")
+    print(argu)
+    
+test('python', True)
+test(20, True)
+
+
+#example5
+from functools import wraps
+def fk_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        print("调用被装饰的函数")
+        return f(*args, **kwds)
+    return wrapper
+
+@fk_decorator
+def test():      #fk_decorator装饰test
+    '''none'''
+    print("do test")
+
+test()
+print(test.__name__)
+print(test.__doc__)
 ---------------------------------------------------------
 
 
