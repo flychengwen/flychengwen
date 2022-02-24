@@ -1,12 +1,14 @@
+yum localinstall *.rpm -y
+yum remove kernel-*3.10.0* -y
+
+arping -i eth0  10.10.10.6  
+systemctl restart xxx.service
+curl http://aaa.bbb.com/messages/event/f9755192-b89d-11eb-b74e-1e00e202ff80
+
 virsh vncdisplay E2129017-ins-dugclldqqd4ye610-20220110170124
 virsh vncdisplay 8
 virsh domiflist E2129017-ins-kxa2st4qsd5yy690-20220106104920
 virsh domiflist 8
-
-arping -i eth0  10.10.10.6  
-
-systemctl restart cds-event.service 
-curl http://message-bus.region-bj.cloudos.com/messages/event/f9755192-b89d-11eb-b74e-1e00e202ff80
 
 virt-clone --original E020910-ins-6qz6qg0qkdjy56v0-20220110162504 --name centos8.3-online --file centos8.3-online.qcow2
 virsh qemu-agent-command 33 '{"execute":"guest-exec","arguments":{"path":"wmic","arg":["logicaldisk get name,freespace,size"],"capture-output":true}}' --pretty
