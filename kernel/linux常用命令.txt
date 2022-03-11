@@ -1,2 +1,0 @@
-yum localinstall *.rpm -y
-yum remove kernel-*3.10.0* -y
